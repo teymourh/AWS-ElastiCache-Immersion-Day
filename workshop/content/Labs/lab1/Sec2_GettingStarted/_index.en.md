@@ -15,25 +15,24 @@ Login with the 12-digit hash provided:
 
 ## Log into Event Engine and AWS Console
 
-Once logged into the Event Engine Team Dashboard, retrieve the SSH Key for connectivity to EC2 instance and access AWS Console. 
+Once logged into the Event Engine Team Dashboard access AWS Console. 
 
-ACTION: Click on “SSH Key” button and download key: 
-
-{{% img "TeamDashSSHkey.png" "TeamDash SSHkey" %}}
-
-
-{{% img "SSHkey.png" "SSH key" %}}
-
-ACTION: Return to dashboard and click on “AWS Console” button to be directed to console login page and login: 
+**ACTION:** On dashboard click on “AWS Console” button to be directed to console login page and login: 
 
 {{% img "TeamDashAWSConsole.png" "TeamDash AWSConsole" %}}
 
 {{% img "AWSConsoleLogin.png" "AWS Console Login" %}}
 
-ACTION: On AWS Console navigate to EC2 dashboard and instance:
+**ACTION:** Retrieve the Public IP address to be able to access sample application.
 
-{{% img "AWSmgmtConsoleEc2.png" "AWS Mgmt Ec2 Console" %}}
+1. On the AWS Console navigate to ECS dashboard:
+{{% img "AWSmgmtConsoleEcs.png" "AWS Mgmt Ec2 Console" %}}
 
-{{% img "Ec2Resources.png" "Ec2 Resources" %}}
+2. Select the ECS “CacheDemoECSService1” Cluster:
+{{% img "AWSmgmtConsoleEcsCluster1.png" "Ec2 Resources" %}}
+3. Go to the Tasks tab, and select the running task, to find the IP associated with sample application:
+{{% img "AWSmgmtConsoleEcsCluster2.png" "Ec2 Resources" %}}
+4. Copy Public IP Address:
+{{% img "AWSmgmtConsoleEcsClusterIP.png" "Ec2 Resources" %}}
 
 
