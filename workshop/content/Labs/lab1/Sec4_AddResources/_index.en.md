@@ -8,7 +8,10 @@ For more information about Amazon ElastiCache for Redis and where you can go fro
 
 •	[Amazon ElastiCache for Redis Resources:](https://aws.amazon.com/elasticache/redis/resources).
 
-•	[Additional Labs](https://aws.amazon.com/getting-started/projects/). {{% notice note %}}
-Check the 'Databases' box on the left. 
+•	[Additional Labs](https://aws.amazon.com/getting-started/projects/). 
+    {{% img "addLab.png" "Add labs" %}} 
+{{% notice note %}}
+Check the 'Databases' box on the left & Search for 'ElastiCache'. 
+
 {{% /notice %}}
 

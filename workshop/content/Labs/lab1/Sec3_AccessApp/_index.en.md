@@ -45,7 +45,8 @@ sudo su - ec2-user
 
 **ACTION:** Connect to ElastiCache for Redis Cluster via redis-cli tool:
 
-1.
+1. Use the redis command line specifying Redis host & port (default 6379).  Here we use the '$REDIS_MASTER_HOST' 
+   environment variable which has be pre-configured for you:
 
 ```bash
 redis-cli -h $REDIS_MASTER_HOST -p 6379
@@ -78,10 +79,10 @@ As you can see from the output below, the application has created 5 keys that it
 
 {{% img "Keys.png" "Keys *" %}}
 
-**ACTION:** In the terminal where the redis-cli is running, type the following command to get the value of key ‘db_cahce_redis_time’:
+**ACTION:** In the terminal where the redis-cli is running, type the following command to get the value of key ‘db_cache_redis_time’:
 
 ```bash
-GET  db_cahce_redis_time
+GET  db_cache_redis_time
 ```
 
 **ACTION:** Click ‘Query Db’ on the browser and repeat the above command to see the value updated”

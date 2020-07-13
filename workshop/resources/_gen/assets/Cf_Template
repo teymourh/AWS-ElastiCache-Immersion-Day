@@ -1,0 +1,363 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ELC Db Cache Demo Cloudformation Stack
+Parameters:
+  EEKeyPair:
+    Description: Name of the EC2 KeyPair generated for the Team
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: ee-default-keypair
+  DatabaseUser:
+    Description: Awesome first parameter for this team template
+    Type: String
+    Default: DatabaseUser
+  DatabasePassword:
+    Description: Awesome first parameter for this team template
+    Type: String
+    Default: DatabasePassword
+Resources:
+  WebServerInstance:
+    Type: AWS::EC2::Instance
+    DependsOn: 
+      - ELCReplicationGroup
+      - DBinstance
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          packages:
+            yum:
+              git: []
+              mysql: []
+              gcc: []
+              docker: []
+              tcl: []
+              make: []
+    Properties:
+      ImageId: ami-0915e09cc7ceee3ab
+      InstanceType: t3.large
+      IamInstanceProfile: !Ref Ec2InstanceProfile
+      Tags: 
+        - Key: "Name"
+          Value: "ElastiCache Lab Bastion Host"
+      KeyName:
+        Ref: EEKeyPair
+      NetworkInterfaces:
+      - AssociatePublicIpAddress: 'true'
+        DeviceIndex: '0'
+        GroupSet:
+        - Ref: WebServerSecurityGroup
+        SubnetId:
+          Ref: PublicSubnet
+      UserData:
+        Fn::Base64: !Sub |     # No more Fn::Join needed
+          #!/bin/bash
+          sudo yum install -y mysql
+          sudo yum install -y redis
+          sudo yum install -y gcc
+          sudo cp src/redis-cli /usr/local/bin/
+          echo export MYSQL_HOST=${DBinstance.Endpoint.Address} >> /etc/profile
+          echo export REDIS_MASTER_HOST=${ELCReplicationGroup.PrimaryEndPoint.Address} >> /etc/profile
+          echo export REDIS_MASTER_PORT=${ELCReplicationGroup.PrimaryEndPoint.Port} >> /etc/profile
+          echo export REDIS_READER_PORT=${ELCReplicationGroup.PrimaryEndPoint.Port} >> /etc/profile
+          echo export DATABASE_USER=${DatabaseUser} >> /etc/profile
+          echo export DATABASE_PASS=${DatabasePassword} >> /etc/profile
+          wget https://raw.githubusercontent.com/zachgardner/ElastiCacheDemo/master/helper/reviews.sql
+          mysql -h ${DBinstance.Endpoint.Address} -u ${DatabaseUser}  --password=${DatabasePassword}  -P 3306  < reviews.sql
+          cd /usr/local/src
+          sudo wget http://download.redis.io/releases/redis-5.0.6.tar.gz
+          sudo tar xvzf redis-5.0.6.tar.gz
+          sudo rm -f redis-stable.tar.gz
+          cd redis-5.0.6
+          sudo make distclean
+          sudo make
+          sudo cp src/redis-cli /usr/local/bin/
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock: 196.0.0.0/25
+      AvailabilityZone: us-east-1a
+  ElcSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock: 196.0.0.224/28
+      AvailabilityZone: us-east-1a
+  ElcSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock: 196.0.0.240/28
+      AvailabilityZone: us-east-1d
+  DBSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock: 196.0.0.128/26
+      AvailabilityZone: us-east-1a
+  DBSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock: 196.0.0.192/27
+      AvailabilityZone: us-east-1b
+  WebServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTP access via port 80
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '80'
+        ToPort: '80'
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp: 0.0.0.0/0
+      VpcId:
+        Ref: VPC
+  ELCRGSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ELC Security Group
+      SecurityGroupIngress:
+      - SourceSecurityGroupId:
+          Ref: WebServerSecurityGroup
+        IpProtocol: "-1"
+      VpcId:
+        Ref: VPC
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      SecurityGroupIngress:
+      - SourceSecurityGroupId:
+          Ref: WebServerSecurityGroup
+        IpProtocol: "-1"
+      VpcId:
+        Ref: VPC
+      GroupDescription: Frontend Access
+  ELCReplicationGroup:
+    Type: AWS::ElastiCache::ReplicationGroup
+    Properties:
+      ReplicationGroupId: ElcLabCluster
+      ReplicationGroupDescription: Demo Multi-AZ ElastiCache Cluster
+      AutomaticFailoverEnabled: true
+      AutoMinorVersionUpgrade: true
+      CacheNodeType: cache.t3.medium
+      CacheSubnetGroupName:
+        Ref: CacheSubnetGroup
+      Engine: redis
+      EngineVersion: 5.0.6
+      NodeGroupConfiguration:
+      - ReplicaCount: '1'
+        PrimaryAvailabilityZone: us-east-1a
+        ReplicaAvailabilityZones:
+        - us-east-1d
+      Port: 6379
+      PreferredMaintenanceWindow: sun:05:00-sun:09:00
+      SnapshotRetentionLimit: 5
+      SnapshotWindow: 10:00-12:00
+      SecurityGroupIds:
+      - Ref: ELCRGSecurityGroup
+      Tags:
+      - Key: key
+        Value: value
+      - Key: key2
+        Value: value2
+  CacheSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: ELC SubnetGroup
+      SubnetIds:
+      - Ref: ElcSubnet1
+      - Ref: ElcSubnet2
+  DBinstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      VPCSecurityGroups:
+      - Ref: DBSecurityGroup
+      AvailabilityZone: us-east-1a
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
+      DBInstanceIdentifier: ElastiCacheLabMySQL    
+      DBName: DemoDB
+      AllocatedStorage: '5'
+      DBInstanceClass: db.t3.small
+      Engine: MySQL
+      EngineVersion: 8.0.16
+      MasterUsername: !Ref DatabaseUser
+      MasterUserPassword: !Ref DatabasePassword
+    DeletionPolicy: Delete
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: DB SubnetGroup
+      SubnetIds:
+      - Ref: DBSubnetA
+      - Ref: DBSubnetB
+  VPCRouteTableRoute:
+    Type: AWS::EC2::Route
+    DependsOn: VPCInternetGateway
+    Properties:
+      RouteTableId:
+        Ref: VPCRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: VPCInternetGateway
+  VPCRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPC
+      Tags:
+      - Key: RouteTableVpc
+        Value: VPC
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet
+      RouteTableId:
+        Ref: VPCRouteTable
+  # https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-configuring-access-role.html
+  Ec2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles: [ !Ref Ec2InstanceRole ]
+  Ec2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        # ********** This is really the only adjustment we need to make to enable use of SSM Session Manager
+        #            All the AWS::CloudFormation::Init and cloud init script work is setting up cloudwatch logs
+        #            to give visibility to the SSM Agent actions.
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ ec2.amazonaws.com ]
+            Action:
+              - sts:AssumeRole
+      Path: /
+  VPCAttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: VPC
+      InternetGatewayId:
+        Ref: VPCInternetGateway
+  VPCInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: GWinfo
+        Value: VPCwebServerGW
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      NetworkMode: "awsvpc"
+      Cpu: "512"
+      Memory: "1024"
+      RequiresCompatibilities:
+        - "FARGATE"
+      ContainerDefinitions:
+        -
+          Name: 'CacheDemoECSService'
+          Cpu: "512"
+          Image: "zachgardner/elcdemo:1.2"
+          Memory: "1024"
+          Environment:
+           -
+            Name: DB
+            Value: "reviews"
+           -
+            Name: HOST
+            Value: !GetAtt DBinstance.Endpoint.Address
+           -
+            Name: PASS
+            Value: !Ref DatabasePassword
+           -
+            Name: PORT
+            Value: "3306"
+           -
+            Name: REDIS_MASTER_HOST
+            Value: !GetAtt ELCReplicationGroup.PrimaryEndPoint.Address
+           -
+            Name: REDIS_MASTER_PORT
+            Value: !GetAtt ELCReplicationGroup.PrimaryEndPoint.Port
+           -
+            Name: REDIS_READER_HOST
+            Value: !Select [0, !GetAtt ELCReplicationGroup.ReadEndPoint.Addresses.List]
+           -
+            Name: REDIS_READER_PORT
+            Value: !GetAtt ELCReplicationGroup.ReaderEndPoint.Port
+           -
+            Name: USER
+            Value: !Ref DatabaseUser
+           -
+            Name: SQL_QUERY_TEXT
+            Value: 'SELECT customer_id, review_id FROM reviews limit {}'
+          Essential: true
+
+  ECSCluster:
+    Type: 'AWS::ECS::Cluster'
+    Properties:
+      ClusterName: !Join ['', ['CacheDemoECSService', "1"]]
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+      Tags:
+        - Key: environment
+          Value: production
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join ['', ['CacheDemoECSService', ExecutionRole]]
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join ['', ['CacheDemoECSService', TaskRole]]
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: 'CacheDemoECSService'
+      Cluster: !Ref ECSCluster
+      TaskDefinition: !Ref TaskDefinition
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 100
+        MaximumPercent: 200
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          # change to DISABLED if you're using private subnets that have access to a NAT gateway
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref PublicSubnet
+          SecurityGroups:
+            - !Ref WebServerSecurityGroup
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 196.0.0.0/24
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
