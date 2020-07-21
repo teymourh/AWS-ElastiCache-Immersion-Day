@@ -46,7 +46,7 @@ sudo su - ec2-user
 **ACTION:** Connect to ElastiCache for Redis Cluster via redis-cli tool:
 
 1. Use the redis command line specifying Redis host & port (default 6379).  Here we use the '$REDIS_MASTER_HOST' 
-   environment variable which has be pre-configured for you:
+   environment variable which has been pre-configured for you:
 
 ```bash
 redis-cli -h $REDIS_MASTER_HOST -p 6379
