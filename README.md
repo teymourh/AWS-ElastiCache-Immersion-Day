@@ -6,6 +6,7 @@
 Launch Site locally by using the following command:
 
 ```bash
+cd workshop
 hugo serve
 ```
 
@@ -15,3 +16,4 @@ Go to `http://localhost:1313`
 
 Labs:
 Lab I: ElastiCache Redis DB Cache
+Lab II: Redis migration
