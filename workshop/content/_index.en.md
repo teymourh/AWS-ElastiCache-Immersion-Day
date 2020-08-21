@@ -4,7 +4,7 @@ chapter = true
 weight = 1
 +++
 In this workshop, we will work through labs exploring AWS ElastiCache features and functionality, and
-the use cases it can server.
+the use cases it can serve.
 
 {{% img "Amazon-ElastiCache@4x.png" "AWS ElastiCache" %}}
 

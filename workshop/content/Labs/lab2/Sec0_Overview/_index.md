@@ -1,7 +1,7 @@
 ---
 title: "Lab Overview"
 date: 2020-08-19T17:57:37-06:00
-weight: 10
+weight: 1
 ---
 
 ![Event Engine Login](/images/Lab2Overview.png)

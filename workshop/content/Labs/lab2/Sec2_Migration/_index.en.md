@@ -1,7 +1,7 @@
 ---
 title: "Migration"
 date: 2020-08-19T08:02:37-06:00
-weight: 20
+weight: 3
 ---
 
 In this section we will cover the migration from a standalone Redis server to an AWS ElastiCache Redis with cluster mode disabled.
