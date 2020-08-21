@@ -21,11 +21,15 @@ In this step, you will use a CloudFormation (CFN) template to deploy the infrast
 	| ------ | ------ |
 	| **EEKeyPair** | The EC2 keypair you created in the previous section. |
 	| **DatabaseUser** | Database user name for MySQL database. |
-	| **DatabasePassword** | Database password for MySQL database. |
+	| **DatabasePassword** | Database password for MySQL database. Note: password complexity requires at least 6 characters!|
 
 {{% notice warning %}}
 The resources that are created here will be prefixed with whatever value you specify in the Stack Name.  Please specify a value that is **unique** to your account.
 {{% /notice %}} 
+
+{{% notice info %}}
+Depending on the type of  workshop that you are completing, you may get a different set of parameters that can vary from the above screenshot.
+{{% /notice %}}
 
 ![\[input-parameters\]](/images/screenshots/EnvConfig06.png)
 
@@ -41,13 +45,5 @@ The resources that are created here will be prefixed with whatever value you spe
 
 11.	Once CloudFormation status changes to **CREATE_COMPLETE**, go to the **Outputs** section.
 
-12.	Make a note of the **Output** values from the CloudFormation environment that you launched as you will need them for the remainder of the tutorial:
-    - Microsoft SQL Server to Amazon Aurora (MySQL) migration workshop:
-    
-    ![\[sqlserver-outputs\]](/images/screenshots/EnvConfig09.png)
-    
-    - Oracle to Amazon Aurora (PostgreSQL) migration workshop:
-    
-    ![\[oracle-outputs\]](/images/screenshots/EnvConfig10.png)
-
+12.	Make a note of the **Output** values from the CloudFormation environment that you launched as you will need them for the remainder of the tutorial
 ___
