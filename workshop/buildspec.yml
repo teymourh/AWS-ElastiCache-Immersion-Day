@@ -18,7 +18,7 @@ phases:
       - pwd
       - ls
       - hugo version
-      - if [ -e "themes/learn" ]; then echo "Learn theme already exists. Keeping original"; else git clone https://github.com/brentley/hugo-theme-learn.git themes/learn; fi
+      - if [ -e "themes/learn" ]; then echo "Learn theme already exists. Keeping original"; else git clone $LEARN_THEME_CLONE_URL themes/learn; fi
       - hugo -d dist
       - cd dist
       - aws s3 cp --recursive . s3://${S3_WEBSITE_BUCKET}/${S3_WEBSITE_KEY}/
