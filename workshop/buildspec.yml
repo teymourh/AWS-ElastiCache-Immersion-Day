@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 10
+    commands:
+      - cd ${CODEBUILD_SRC_DIR}/${WEBSITE_SRC_DIR}
+      - env      
+      - ls
+      - pwd
+      - curl https://github.com/gohugoio/hugo/releases/download/v0.63.2/hugo_0.63.2_Linux-64bit.deb -LO
+      - apt-get -y install ./hugo_0.63.2_Linux-64bit.deb
+  build:
+    commands:
+      - cd ${CODEBUILD_SRC_DIR}/${WEBSITE_SRC_DIR}
+      - env
+      - pwd
+      - ls
+      - hugo version
+      - git clone https://github.com/brentley/hugo-theme-learn.git themes/learn
+      - hugo -d dist
+      - cd dist
+      - aws s3 cp --recursive . s3://${S3_WEBSITE_BUCKET}/${S3_WEBSITE_KEY}/
+      - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} --paths '/*'
