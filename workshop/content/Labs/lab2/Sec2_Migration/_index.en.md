@@ -41,7 +41,7 @@ exit
 We will download this 2000 key dataset [data.txt](sec1_migration/data.txt) and insert it into our standalong Redis server. 
 
 ```
-wget https://raw.githubusercontent.com/rudpot/AWS-ElastiCache-Immersion-Day/master/workshop/content/Labs/lab2/Sec1_Migration/data.txt
+wget https://raw.githubusercontent.com/rudpot/AWS-ElastiCache-Immersion-Day/master/workshop/content/Labs/lab2/Sec2_Migration/data.txt
 cat ~/data.txt | redis-cli -h localhost --pipe
 ```
 
@@ -54,6 +54,7 @@ redis-cli -h localhost
 ```redis
 keys *
 dbsize
+exit
 ```
 
 ### Connecting to Elasticache
@@ -62,9 +63,6 @@ As discussed in [Lab1](/labs/lab1/sec3_setupandvalidation.html) we already start
 
 ```bash
 redis-cli -h localhost
-```
-
-```redis
 config set protected-mode no
 exit
 ```
@@ -153,8 +151,6 @@ From the "Actions" dropdown select "Migrate Data From Endpoint"
 {{% img "ElastiCacheMigrationDisable.png" "Disable migration options" %}}
 
 Note that it takes a substantial amount of time for this to take effect.
-
-
 
 
 <!-- ### Cluster mode enabled version
