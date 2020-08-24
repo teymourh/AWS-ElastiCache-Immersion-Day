@@ -19,22 +19,28 @@ To connect via SSH, browse to the [EC2 console](https://console.aws.amazon.com/e
 
 Then using an ssh client, e.g. putty, connect to the instance IP with user name `ec2-user` and the public key that you created in the getting started secion.
 
-### Option 2: Session Manager
+### Option 2: Session Manager - Preferred
 
-To connect via AWS Systems Manager Session Manager, browse to the [AWS Systems Manager console](https://console.aws.amazon.com/systems-manager/session-manager/start-session), select the desired host, `ElastiCache Lab Bastion Host`, and click "Start session"
+To connect via AWS Systems Manager Session Manager, browse to the [AWS Systems Manager console](https://console.aws.amazon.com/systems-manager/session-manager/start-session), select the desired host, `ElastiCache Lab Bastion Host`, and click "Start session". If you have trouble accessing this location, ensure you are disconnected from a client VPN on your computer.
 
 {{% img "SsmStartSession.png" "Connect via SSM" %}}
 
 ### Using the console
 
-You should now be logged-in on the bastion host via a unix shell. You  can validate all is well by running these commands
+Set up the proper login credentials before proceding with your session.
+
+```bash
+sudo su - ec2-user
+source /etc/profile
+export PATH=$PATH:/usr/local/src/redis-5.0.6/src/
+```
+
+You should now be logged-in on the bastion host via a unix shell. You can validate all is well by running these commands
 
 ```bash
 env | grep REDIS
 env | grep MYSQL
 ```
-
-
 
 ## RDS MySQL
 
