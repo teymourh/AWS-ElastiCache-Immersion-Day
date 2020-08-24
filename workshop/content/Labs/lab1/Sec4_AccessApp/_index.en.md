@@ -124,6 +124,7 @@ GET  db_cache_redis_time
 Following the description of caching above, we would expect to also see hash keys for the cache. The reason you might not see those in the output above is that the keys are set to expire after a few seconds. If you want to assure yourself that things are working as expected call the db update and redis check back-to back from the terminal. To do so, first set the IP address of the ECS cluster:
 
 ```bash
+exit
 export ECS_IP=<IP>
 ```
 
