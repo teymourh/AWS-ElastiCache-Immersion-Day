@@ -111,14 +111,14 @@ As you can see from the output below, the application has created 5 keys that it
 
 {{% img "Keys.png" "Keys *" %}}
 
-**ACTION:** In the terminal where the redis-cli is running, type the following command to get the value of key ‘db_cache_redis_time’:
+**ACTION:** In the terminal where the redis-cli is running, type the following command to get the value of key ‘db_cache_redis_time’. This returns the total time spent in the redis database for the cache hits in microseconds:
 
 ```bash
 GET  db_cache_redis_time
 ```
 
 **ACTION:** Click ‘Query Db’ on the browser and repeat the above command to see the value updated”
-{{% img "GetDBCacheTime.png" "Get command" %}}
+
 
 
 Following the description of caching above, we would expect to also see hash keys for the cache. The reason you might not see those in the output above is that the keys are set to expire after a few seconds. If you want to assure yourself that things are working as expected call the db update and redis check back-to back from the terminal. To do so, first set the IP address of the ECS cluster task, located in task found [here](https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/CacheDemoECSService1/tasks):
