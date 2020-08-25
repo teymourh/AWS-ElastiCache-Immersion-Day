@@ -23,7 +23,7 @@ Now let's check if redis is running on the local host:
 redis-cli -h localhost
 ```
 
-Now that you are logged into redis, verify that there are no keys pre-loaded. The `keys *` query should return emtpy:
+Now that you are logged into redis, verify that there are no keys pre-loaded. The `keys *` query should return empty:
 
 ```redis
 keys *
