@@ -32,7 +32,7 @@ Set up the proper login credentials before proceding with your session.
 ```bash
 sudo su - ec2-user
 source /etc/profile
-export PATH=$PATH:/usr/local/src/redis-5.0.6/src/
+export PATH=$PATH:/usr/local/src/redis-5.0.6/src/:/usr/local/bin/
 ```
 
 You should now be logged-in on the bastion host via a unix shell. You can validate all is well by running these commands
