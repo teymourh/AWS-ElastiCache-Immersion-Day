@@ -62,9 +62,10 @@ exit
 As discussed in [Lab1](/labs/lab1/sec3_setupandvalidation.html) we already started an ElastiCache instance. However, we need to enable external access to the redis cluster we just started. For this we need to enable security group access from ElastiCache and change the [protected mode](https://redis.io/topics/security) setting to allow external access. To unset protected mode connect to redis via the CLI:
 
 ```bash
-redis-cli -h localhost
+redis-cli -h localhost <<EOF
 config set protected-mode no
 exit
+EOF
 ```
 
 To enable security group access let's first copy the security group ID associated with the ElastiCache instance. Now navigate to the [ElastiCache console](https://console.aws.amazon.com/elasticache/home?#redis:) and select "Redis". Then select the checkbox besides `elclabcluster`. Then copy the security group ID:
