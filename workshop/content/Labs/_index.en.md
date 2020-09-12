@@ -1,7 +1,7 @@
 +++
 title = "Labs"
 chapter = true
-weight = 10
+weight = 20
 +++
 
 AWS ElastiCache Labs.

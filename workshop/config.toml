@@ -14,7 +14,7 @@ pygmentsCodeFences = true
 pygmentsStyle = "monokai"
 
 [params]
-  editURL = "https://code.amazon.com/packages/Aws-workshop-template/blobs/master/--/workshop/content/"
+  editURL = "https://github.com/rudpot/AWS-ElastiCache-Immersion-Day/blob/master/workshop/content/"
   description = "AWS ElastiCache Workshop"
   author = "Jane Architect"
   disableBreadcrumb = false
